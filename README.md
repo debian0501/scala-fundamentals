@@ -480,3 +480,140 @@ Note:
 <!--v-->
 
 ## Pattern Matching
+
+```scala
+object Greeter {
+  
+  def sayHello(person: Person) : String = 
+      person match {
+        case Person("Donald", "Duck") => "hewow"
+        case Person("Alois", "Hingerl") => "Servus"
+        case Person("Antje", "Wörmsen") => "Goedendag"
+        case Person(firstName, lastName) => "Hallo"
+      } 
+}
+```
+
+* Pattern matching is like an extended if expression
+* Pattern matching is itself an expression 
+
+<!--v-->
+## Pattern Syntax
+
+```scala
+Person(pat0, pat1)
+```
+The following patterns we could use for pat0 or pat1:
+
+1. A name, which matches any value at that position and binds it to the given name
+1. An (_), which matches any value and ignores it.
+1. A literal, which successfully matches only the value the literal respresents
+1. Another case class using the same constructor style syntax
+
+<!--v-->
+## Exercises
+* See workspace exercise03
+<!--s-->
+
+# Traits
+<!--v-->
+
+## What is a Trait
+
+* Traits are very much like Java 8’s interfaces with default methods.
+* For not Java 8 users: Traits can be considered like a cross between interfaces and abstract classes
+
+<!--v-->
+## An Example of Traits
+```scala
+import java.util.Date
+
+trait Visitor {
+  def id: String      // Unique id assigned to each user
+  def createdAt: Date // Date this user first visited the site
+
+  // How long has this visitor been around?
+  def age: Long = new Date().getTime - createdAt.getTime
+}
+
+case class Anonymous(
+  id: String,
+  createdAt: Date = new Date()
+) extends Visitor
+
+case class User(
+  id: String,
+  email: String,
+  createdAt: Date = new Date()
+) extends Visitor
+```
+Notes:
+
+* we defined the trait Visitor
+* Anonymous and User are subtypes of the Visitor trait by using the extends keyword.
+* The Visitor trait expresses an interface that any subtype must implement
+* Any sub-type of Visitor also automatically has a method age as defined in Visitor.
+* The methods defined in the trait are derived to the subtypes
+
+<!--v-->
+## Traits Compared to Classes
+
+* A trait cannot have a constructor
+* Traits can define abstract methods that have names and type signatures but no implementation
+
+> Scala sees `def` as a more general version of `val`. It is good practice to never define vals in a trait, but rather to use def
+
+<!--v-->
+## Excercises
+* See workspace exercise04
+<!--v-->
+
+## Sealed Traits
+```scala
+sealed trait Visitor { /* ... */ }
+final case class User(/* ... */) extends Visitor
+final case class Anonymous(/* ... */) extends Visitor
+```
+
+* All subtypes must be defined in the same file
+* `final` for disallow all extensions
+* The compiler will warn us if a pattern matching expression is missing a case
+
+<!--v-->
+## Excercises
+* See workspace exercise05
+<!--v-->
+
+## Mixins
+A trait is called mixin when it is mixed with a class
+```scala
+trait A {
+    def message : String
+    def whoAmI = "I am trait A"
+}
+trait B extends A {
+  def uppercaseMessage : String = message.toUpperCase
+  override def whoAmI = "I am trait B"
+
+}
+trait C extends A {
+  def reverseMessage : String = message.reverse
+  override def whoAmI = "I am trait C"
+}
+class D extends A with B with C {
+    override val message = "Hello"
+}
+```
+
+Note: 
+* Mixins can be thought as a dynamic additions of methods into an object
+* In case of conflicting methods the rightmost mixin is used
+* Mixins, however, aren't inheritance – it's actually more similar to dynamically 
+adding a set of methods into an object. Whereas inheritance says "This thing is a kind of another thing", mixins say, 
+"This object has some traits of this other thing
+
+<!--s-->
+
+# Functions and generics
+
+<!--v-->

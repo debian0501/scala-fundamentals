@@ -1,7 +1,8 @@
 package fundamentals.exercise02
 
-//Turn this class into a case class
-//What happens with our companion object? Is Scala’s case class code generator still working as expected?
+/* Turn this class into a case class
+ * What happens with our companion object? Is Scala’s case class code generator still working as expected?
+ */
 class Person(val firstName: String, val lastName: String) {
 
   def name = firstName + " " + lastName
