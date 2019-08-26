@@ -614,6 +614,403 @@ adding a set of methods into an object. Whereas inheritance says "This thing is 
 
 <!--s-->
 
-# Functions and generics
+# Functions
 
+<!--v-->
+
+## Generics
+```scala
+sealed trait Return 
+final case class Success[T](value: T) extends Return
+final case class Failure(message: String) extends Return
+
+object Div {
+  def safeDiv(divident : Int, divisor: Int) : Return =
+      if (divisor == 0) Failure("divide by 0") 
+      else Success(divident / divisor) 
+      //if we omit the type parameter, scala will infer its value
+}
+```
+<!--v-->
+
+## Working with functions
+```scala
+sealed trait Return[+T] {
+  def map[B] (f: (T) => B) : Return[B] =
+    this match {
+      case Success(v) => Success(f(v))
+      case Failure(m) => Failure(m)
+    }
+}
+final case class Success[T](value: T) extends Return[T]
+final case class Failure(message: String) extends Return[Nothing]
+```
+```scala
+Success(1).map(x => x +1)
+```
+Note: 
+* Varianz
+* Return becames a generic trait
+* Nothing as placeholder
+
+<!--v-->
+## Function literals
+```scala
+val sayHello = () => "Hello"
+val add1 = (x: Int) => (x + 1) 
+val add = (x: Int, y:Int) => x + y
+```
+* Return type is normally inferred 
+
+<!--v-->
+
+## Placeholder syntax
+```scala
+Success(1).map(_ + 1)           // == Success(1).map(x => x +1) 
+Success(-1).map(math.abs(_))    // == (-1).map(x => math.abs(x)) 
+Success(1).map(math.min(5, _))  // == Success(1).map(x => math.min(5, 1))   
+_ + _                           // == `(a, b) => a + b`
+_(foo)                          // == `(a) => a(foo)`
+// and so on...
+```
+Placeholder syntax should only be used for very small functions.
+<!--v-->
+
+## Using methods as functions
+```scala
+val divFun = Div.safeDiv _
+```
+If Scala can infer that we need a function, we can even drop the underscore and simply write the method name
+
+```scala
+object Div {
+  def divBy2(x: Int) : Int = x / 2
+}
+```
+
+```console
+scala> Success(10).map(divBy2)
+res48: Return[Int] = Success(5)
+```
+<!--v-->
+## Multiple Parameter Lists
+Methods in Scala can have multiple parameter lists
+
+
+```scala
+def foo[A](retVal: A, value: A, f: (A) => Boolean) : A =
+  if (f(value)) retVal else value
+```
+```console
+scala> foo("bar", "foo", (x:String) => x == "foo")
+res8: String = bar
+```
+vs
+```scala
+def foo[A](retVal: A, value: A)( f: (A) => Boolean) : A =
+  if (f(value)) retVal else value
+```
+```console
+scala> foo("bar", "foo"){x => x == "foo"}
+res2: String = bar
+```
+
+Note:
+* Scala’s type inference algorithm cannot use a type inferred for one parameter for another parameter
+* looks nicer with inline functions
+* assist with type inference
+<!--v-->
+
+## Tuples
+Scala includes tuple types with up to 22 elements
+```console
+scala> val tuple = ("hi", 1, true)
+tuple: (String, Int, Boolean) = (hi,1,true)
+
+scala> tuple._1
+res10: String = hi
+
+scala> tuple._2
+res11: Int = 1
+
+scala> tuple._3
+res12: Boolean = true
+
+```
+<!--v-->
+## Working with tuples
+
+Tuples as function arguments:
+```scala
+def tupleAdd(a: (Int, Int), b: (Int, Int)) : (Int, Int) =
+    (a._1 + b._1, a._2 + b._2)
+```
+Pattern matching with tuples:
+```scala
+def returnDuck(names: (String, String)) : String =
+    names match {
+      case duck @ (_, "Duck") => s"${duck._1} ${duck._2}"
+      case _ => "not found"
+    }
+```
+<!--v-->
+## Excercises
+* See workspace exercise06
+
+<!--s-->
+# Collections
+
+<!--v-->
+## Sequences
+
+```console
+scala> val sequence = Seq(1, 2, 3)
+sequence: Seq[Int] = List(1, 2, 3)
+```
+* collection of items with a defined and stable order
+* Scalas collections are immutable per default
+* Type `Seq[Int]` is implemented by a `List`.
+* Seq would be Java's List, and Scala's List would be Java's LinkedList
+
+<!--v-->
+## Accessing elements
+
+```console
+scala> val sequence = Seq(1, 2, 3)
+sequence: Seq[Int] = List(1, 2, 3)
+
+scala> sequence.apply(1)
+res1: Int = 2
+
+scala> sequence(1)
+res2: Int = 2
+
+scala> sequence.head
+res3: Int = 1
+
+scala> sequence.tail
+res4: Seq[Int] = List(2, 3)
+```
+
+Note: 
+* IndexOutOfBoundsException if there is no element with this index
+* NoSuchElement if no head or tail
+* For safely get the head without risking an exception: sequence.headOption
+
+<!--v-->
+## Searching for elements
+
+```console
+scala> sequence.find(_ == 2)
+res8: Option[Int] = Some(2)
+
+scala> sequence.filter(_ > 1)
+res9: Seq[Int] = List(2, 3)
+```
+* find returns the first element which matches the predicate
+* filter returns all the matching elements in the sequence
+<!--v-->
+
+## Appending/prepending elements
+
+```console
+scala> val seq = Seq(1,2,3) 
+seq: Seq[Int] = List(1, 2, 3)
+
+scala> seq.:+(4) //append
+res19: Seq[Int] = List(1, 2, 3, 4)
+
+scala> seq :+ 4 //idiomatic append
+res20: Seq[Int] = List(1, 2, 3, 4)
+
+scala> seq.+:(0) //prepend
+res21: Seq[Int] = List(0, 1, 2, 3)
+
+scala> 0 +: seq /idiomatic prepend
+res22: Seq[Int] = List(0, 1, 2, 3)
+
+scala> seq ++ Seq(4, 5, 6)
+res23: Seq[Int] = List(1, 2, 3, 4, 5, 6)
+```
+
+Note:
+* Scala’s general syntax rule: Any method ending with a : character becomes right associative when written as an infix operator
+<!--v-->
+
+## Lists
+* The default implementation of Seq is a List
+* Some Libraries using List instead of the more generic Seq type
+
+```console
+scala> Nil //empty List
+res24: scala.collection.immutable.Nil.type = List()
+
+scala> val list = 1 :: 2 :: 3 :: Nil
+list: List[Int] = List(1, 2, 3)
+
+scala> List(1,2,3)
+res25: List[Int] = List(1, 2, 3)
+
+scala> List(1,2,3) ::: List(4,5,6) // List concat
+res30: List[Int] = List(1, 2, 3, 4, 5, 6)
+
+scala> List(1,2,3) ++ List(4,5,6) // Seq concat
+res31: List[Int] = List(1, 2, 3, 4, 5, 6)
+```
+
+<!--v-->
+## Excercises
+* See workspace exercise07
+<!--v-->
+
+## For Comprehensions
+
+```scala
+for {
+  x <- Seq(1, 2, 3)
+} yield x * 2
+// res1: Seq[Int] = List(2, 4, 6)
+```
+
+* The expression containing the <- is called generator.
+* a generator has a pattern on the left hand side and a generator expression on the right.
+* each element is bind to the pattern and then the yield expression is called. 
+* result is a sequence of the same type as the original generator.
+
+<!--v-->
+## For Comprehensions in detail (1)
+```scala
+for {
+  x <- List(1,2)
+  y <- List(3,4)
+  z <- List(5,6)
+} yield (x,y,z)
+// List((1,3,5), (1,3,6), (1,4,5), (1,4,6), (2,3,5), (2,3,6), (2,4,5), (2,4,6))
+```
+same as 
+```scala
+   List(1,2).flatMap(x 
+=> List(3,4).flatMap(y 
+=> List(5,6).map(z 
+=> (x, y, z))))
+```
+<!--v-->
+## For Comprehensions in detail (2)
+
+```scala
+for {
+  x <- List(1,2)
+  y <- List(3,4)
+} println(x + y) // without yield for side effects
+```
+* For comprehensions are very different to for loops in Java 
+* For comprehensions can be used in any class that implements map and flatMap
+
+<!--v-->
+## Excercises
+* See workspace exercise08
+<!--v-->
+
+## Options
+`Option` is a generic sealed trait with two subtypes— `Some` and `None`
+
+```scala
+List("A", "B", "C").find(_ == "B")
+//res5: Option[String] = Some(B)
+
+List("A", "B", "C").find(_ == "Z")
+//res6: Option[String] = None
+```
+<!--v-->
+## Extracting values from Options
+```scala
+List("A", "B", "C").find(_ == "B").getOrElse("Not Found")
+//res7: String = B
+```
+```scala
+List("A", "B", "C").find(_ == "B") match {
+  case Some(str) => s"Found $str"
+  case None => "Not Found"
+}
+//res8: String = Found B
+```
+```scala
+List("A", "B", "C").find(_ == "B").
+  map(str => s"Found $str").getOrElse("Not Found")
+//res11: String = Found B
+```
+<!--v-->
+## Options in for comprehensions
+
+```scala
+def sum(optionA: Option[Int], optionB: Option[Int]) =
+  for {
+    a <- optionA
+    b <- optionB
+  } yield a + b
+```
+```scala
+def sum(optionA: Option[Int], optionB: Option[Int]) =
+  optionA.flatMap(a => optionB.map(b => a + b))
+```
+```scala
+sum(Some(123), Some(456))
+//res2: Option[Int] = Some(579)
+
+sum(Some(123), None)
+//res1: Option[Int] = None
+```
+<!--v-->
+## Excercises
+* See workspace exercise09
+<!--v-->
+
+## Maps
+```scala
+val map = Map("a" -> 1, "b" -> 2, "c" -> 3)
+//map: scala.collection.immutable.Map[String,Int] = Map(a -> 1, b -> 2, c -> 3)
+```
+* The Map constructor accepts an arbitrary number of `Tuple2` 
+* `->` is a function that generates a `Tuple2` 
+Note: 
+* Type is Map[String,Int]
+
+<!--v-->
+## Accessing values
+```scala
+val map = Map("a" -> 1, "b" -> 2, "c" -> 3)
+map("a")
+//res3: Int = 1
+
+map("z")
+//java.util.NoSuchElementException: key not found: z
+
+map.get("a")
+//res5: Option[Int] = Some(1)
+
+map.get("z")
+//res6: Option[Int] = None
+```
+<!--v-->
+
+## Adding and removing elements
+```scala
+val map = Map("a" -> 1, "b" -> 2, "c" -> 3)
+
+val newMap = map.+("d" -> 4) 
+// newMap: scala.collection.immutable.Map[String,Int] = Map(a -> 1, b -> 2, c -> 3, d -> 4)
+
+val newMap2 = map.-("a") 
+// newMap2: scala.collection.immutable.Map[String,Int] = Map(b -> 2, c -> 3)
+
+val newMap3 = map + ("d" -> 4)
+//res8: scala.collection.immutable.Map[String,Int] = Map(a -> 1, b -> 2, c -> 3, d -> 4)
+
+val newMap4 = map - "a"
+//newMap4: scala.collection.immutable.Map[String,Int] = Map(b -> 2, c -> 3)
+```
+
+<!--v-->
+## Excercises
+* See workspace exercise10
 <!--v-->
