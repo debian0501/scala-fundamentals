@@ -1,4 +1,4 @@
-package fundamentals.exercise07
+package de.maibornwolff.scalafundamentals.exercise07
 
 object ListOps {
 

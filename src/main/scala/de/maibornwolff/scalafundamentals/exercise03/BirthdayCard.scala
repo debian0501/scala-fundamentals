@@ -1,4 +1,4 @@
-package fundamentals.exercise03
+package de.maibornwolff.scalafundamentals.exercise03
 
 
 case class Person(firstName: String, lastName: String, age: Int = 0)

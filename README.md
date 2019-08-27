@@ -1,5 +1,5 @@
 ---
-title: Scala fundamentals
+title: Scala de.maibornwolff.fundamentals
 separator: <!--s-->
 verticalSeparator: <!--v-->
 theme: league
@@ -7,7 +7,7 @@ revealOptions:
     transition: 'fade'
 ---
 <!--s-->
-# Scala fundamentals
+# Scala de.maibornwolff.fundamentals
 Stefan López Romero 2019
 
 <!--s-->
@@ -42,7 +42,7 @@ Notes:
 
 * Install scala (2.13.0) from https://www.scala-lang.org/download/
 * Install IntelliJ IDEA Scala plugin
-* Clone https://github.com/debian0501/scala-fundamentals 
+* Clone https://github.com/debian0501/scala-de.maibornwolff.fundamentals 
 
 <!--v-->
 ## Try Scala REPL
@@ -1014,3 +1014,6 @@ val newMap4 = map - "a"
 ## Excercises
 * See workspace exercise10
 <!--v-->
+
+<!--s-->
+# Implicits

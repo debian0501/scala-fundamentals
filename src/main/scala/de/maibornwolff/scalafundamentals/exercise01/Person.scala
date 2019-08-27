@@ -1,4 +1,4 @@
-package fundamentals.exercise01
+package de.maibornwolff.scalafundamentals.exercise01
 
 class Person(val firstName: String, val lastName: String) {
 

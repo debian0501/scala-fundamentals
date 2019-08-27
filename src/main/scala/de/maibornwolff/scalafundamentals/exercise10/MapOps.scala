@@ -1,4 +1,4 @@
-package fundamentals.exercise10
+package de.maibornwolff.scalafundamentals.exercise10
 
 object MapOps {
 
@@ -18,6 +18,7 @@ object MapOps {
 
   // Use the given maps in this main method to print everyone’s favorite color.
   // The output should be like this: "Anna's favorite color is green!"
+  // If a person has no favorite color, no output should take place.
   def main(args: Array[String]): Unit = ???
 
 }

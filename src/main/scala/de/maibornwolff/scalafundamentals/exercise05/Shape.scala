@@ -1,4 +1,4 @@
-package fundamentals.exercise05
+package de.maibornwolff.scalafundamentals.exercise05
 
 
 /*

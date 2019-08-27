@@ -1,4 +1,4 @@
-package fundamentals.exercise02
+package de.maibornwolff.scalafundamentals.exercise02
 
 /* Turn this class into a case class
  * What happens with our companion object? Is Scala’s case class code generator still working as expected?

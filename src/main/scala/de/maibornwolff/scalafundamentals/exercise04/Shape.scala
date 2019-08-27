@@ -1,4 +1,4 @@
-package fundamentals.exercise04
+package de.maibornwolff.scalafundamentals.exercise04
 
 /*
  * A Shape has the following properties:

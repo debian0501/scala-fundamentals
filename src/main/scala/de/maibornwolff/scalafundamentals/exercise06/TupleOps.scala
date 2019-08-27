@@ -1,4 +1,4 @@
-package fundamentals.exercise06
+package de.maibornwolff.scalafundamentals.exercise06
 
 /*
  * Implement functionn called tupleOp which uses a two 2-dimensional tuple and a function which

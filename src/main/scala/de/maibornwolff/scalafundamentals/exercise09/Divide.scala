@@ -1,4 +1,4 @@
-package fundamentals.exercise09
+package de.maibornwolff.scalafundamentals.exercise09
 
 object Divide {
 
