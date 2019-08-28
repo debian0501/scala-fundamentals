@@ -22,6 +22,7 @@ Stefan López Romero 2019
 * Scala 3 aka [Dotty](https://dotty.epfl.ch/) is currently under construction and will be release in 2020.
 
 Notes: 
+*  École polytechnique fédérale de Lausanne
 <!--v-->
 
 ## Features
@@ -60,12 +61,12 @@ scala>
 ```
 
 Notes: 
-* Jede Eingabe wird sofort evaluiert
-* Ergebnis kannn wiederverwendet werden
-* Paste Mode mit :paste
+* Each input is evaluated immediately
+* Result can be reused.
+* Paste Mode with :paste
 * Multiline Expressions
 * :paste + file
-* :type Type einer Expression
+* :type Type of an expression
 
 <!--v-->
 
@@ -160,7 +161,7 @@ res4: Null = null
 * _null_ s are considered very bad practice in Scala
 
 Note:
-* Hierfür wird Option verwendet
+* Therefore option is used
 
 <!--v-->
 ## Unit
@@ -185,7 +186,7 @@ Object NameOfObject = {
 * It is created lazily when it is referenced.
 
 Note:
-* Ist ähnlich zu einer final Java classe mit static methods
+* Is similar to a final Java class with static methods
 
 <!--v-->
 
@@ -265,8 +266,8 @@ object Test {
 }
 ```
 Note:
-* Wieso fields wenn man auch methoden ohne parameter haben kannn
-* Das object ist definiert, es wird aber noch nichts ausgeführt (lazy loading)
+* Why fields when you can have methods without parameters too
+* The object is defined, but nothing is executed yet (lazy loading)
 * Test.field:  body expression of a field is run only once
 * Test.method: body of a method is evaluated every time we call the method
 <!--v-->
@@ -372,7 +373,7 @@ class Person(var firstName: String, var lastName: String) {
 }
 * p.firstName = "daisy"
 * Optional: java beans @BeanProperty
-* Sichtbarkeit: class Person(private val firstName: String, val lastName: String)
+* Visibility: class Person(private val firstName: String, val lastName: String)
 
 <!--v-->
 ## Default and Keyword Parameters 
@@ -564,7 +565,7 @@ Notes:
 > Scala sees `def` as a more general version of `val`. It is good practice to never define vals in a trait, but rather to use def
 
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise04
 <!--v-->
 
@@ -580,7 +581,7 @@ final case class Anonymous(/* ... */) extends Visitor
 * The compiler will warn us if a pattern matching expression is missing a case
 
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise05
 <!--v-->
 
@@ -649,8 +650,8 @@ final case class Failure(message: String) extends Return[Nothing]
 Success(1).map(x => x +1)
 ```
 Note: 
-* Varianz
-* Return becames a generic trait
+* Covariance Nothing is subtype of T
+* Return becomes a generic trait
 * Nothing as placeholder
 
 <!--v-->
@@ -754,7 +755,7 @@ def returnDuck(names: (String, String)) : String =
     }
 ```
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise06
 
 <!--s-->
@@ -859,7 +860,7 @@ res31: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise07
 <!--v-->
 
@@ -907,7 +908,7 @@ for {
 * For comprehensions can be used in any class that implements map and flatMap
 
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise08
 <!--v-->
 
@@ -961,7 +962,7 @@ sum(Some(123), None)
 //res1: Option[Int] = None
 ```
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise09
 <!--v-->
 
@@ -1011,9 +1012,163 @@ val newMap4 = map - "a"
 ```
 
 <!--v-->
-## Excercises
+## Exercises
 * See workspace exercise10
 <!--v-->
 
+## Ranges
+A Range represents a sequence of integers from some starting value to less than the end value with a non-zero step
+```scala
+1 until 10
+// res0: scala.collection.immutable.Range = Range 1 until 10
+
+10 until 1 by -1
+//res1: scala.collection.immutable.Range = Range 10 until 1 by -1
+
+for(i <- 0 until 10) println(s"The current number is $i")
+//The current number is 0
+//The current number is 1
+//The current number is 2
+//...
+```
 <!--s-->
 # Implicits
+
+<!--v-->
+## Ordering as example
+
+```scala
+import scala.math.Ordering
+
+val ascOrdering = Ordering.fromLessThan[Int](_ < _)
+val descOrdering = Ordering.fromLessThan[Int](_ > _)
+
+List(3, 4, 2).sorted(ascOrdering)
+// res1: List[Int] = List(2, 3, 4)
+
+List(3, 4, 2).sorted(descOrdering)
+// res3: List[Int] = List(4, 3, 2)
+```
+To construct an Ordering we can use the convenience method `fromLessThan`
+
+<!--v-->
+
+## Implicit Values
+```scala
+import scala.math.Ordering
+
+implicit val ordering = Ordering.fromLessThan[Int](_ < _)
+
+List(7, 10, 1).sorted
+// res4: List[Int] = List(1, 7, 10)
+
+```
+* implicit marked parameter in the method declaration
+```scala
+override def sorted[B >: A](implicit ord : scala.Ordering[B]) : C
+```
+* implicit value of the same type as the parameter
+* only one such implicit value available.
+
+Note:
+* The term B >: A expresses (a lower type bound) that the type parameter B or the abstract type B refer to a supertype of type A
+* The compiler will signal an error if there is any ambiguity in which implicit value should be used 
+<!--v-->
+
+## Declaring Implicit Values
+* An implicit value must be declared within a surrounding object, class, or trait.
+
+```scala
+object Implicits {
+  implicit val one = ...
+  implicit var two = ...
+  implicit object three = ...
+  implicit def four = ...
+}
+```
+* We can tag any `val`, `var`, `object` or zero-argument `def` with the implicit keyword
+
+
+<!--v-->
+
+## Implicit scope and priority
+Where does the compiler search for implicit values?
+
+1. Local scope (identifiers declared or imported from elsewhere)
+1. Companion objects of types involved
+
+Note: 
+* Ordering has already a implicit defined for Int (see: https://www.scala-lang.org/api/current/scala/math/Ordering$.html#Int)
+* Complete rules are rather complex The practical implication is that the local scope takes precedence over instances found in companion objects
+
+
+<!--v-->
+## Exercises
+* See workspace exercise11
+<!--v-->
+
+## Implicit Classes
+
+```scala
+
+object StringImplicits {
+
+    implicit class AdditionalStringMethods(str: String) { 
+ 
+      def toCamelCase = {
+        str.toLowerCase.split("\\s").
+          foldLeft("")((acc, elem) => 
+            s"$acc${elem.substring(0,1).toUpperCase}${elem.substring(1)}")
+      }
+    
+    }
+}
+```
+```scala
+"This is like extension methods in Kotlin".toCamelCase
+//res5: String = ThisIsLikeExtensionMethodsInKotlin
+```
+Note:
+* The Scala compiler uses implicit classes to fix type errors in our code
+* The rules for implicit classes are the same as for implicit values
+<!--v-->
+## Implicit Conversions
+We can tag any single-argument method with the implicit keyword to allow the compiler to implicitly use the method to perform automated conversions from one type to another.
+```scala
+class B {
+  def bar = "foo bar"
+}
+
+class A
+
+implicit def aToB(in: A): B = new B()
+
+new A().bar
+```
+Note:
+* undisciplined use of implicit conversions can cause as problems
+* Better use implicit classes and implicit values/parameters over implicit conversions
+
+
+<!--s-->
+# Conclusion
+
+<!--v-->
+
+## What's missing
+* [Packages and imports](https://docs.scala-lang.org/tour/packages-and-imports.html)
+* [Nested Methods](https://docs.scala-lang.org/tour/nested-functions.html)
+* [Variances](https://docs.scala-lang.org/tour/variances.html) 
+* [Type bounds](https://docs.scala-lang.org/tour/upper-type-bounds.html)
+* [Package Objects](https://docs.scala-lang.org/tour/package-objects.html)
+
+<!--v-->
+## Additional Resources
+* [The red book](https://www.manning.com/books/functional-programming-in-scala)
+* [Functional Programming Principles in Scala](https://de.coursera.org/learn/progfun1)
+* [Rock the JVM! Advanced Scala](https://www.udemy.com/advanced-scala/)
+* [Scala with cats](https://underscore.io/books/scala-with-cats/)
+
+<!--v-->
+
+## Thanks
