@@ -7,7 +7,7 @@ revealOptions:
     transition: 'fade'
 ---
 <!--s-->
-# Scala de.maibornwolff.fundamentals
+# Scala fundamentals
 Stefan López Romero 2019
 
 <!--s-->
@@ -103,13 +103,6 @@ Notes:
 # Scala type system
 
 <!--v-->
-## Expression vs. Statement
-
-> An expression is a combination of one or more values, constants, variables, operators and functions that the programming language interprets and computes to produce another value.
-
-> A statement is the smallest standalone element of an imperative programming language that expresses some action to be carried out.
-
-<!--v-->
 ## Unified type system
 * In Scala there are no primitive types. 
 * Every type is an object
@@ -124,6 +117,9 @@ Note:
 (1).+(2) // same as 1 + 2
 "the quick brown fox" split " "
 ```
+* An expression is a combination of one or more values, constants, variables, operators and functions that the programming language interprets and computes to produce another value.
+* A statement is the smallest standalone element of an imperative programming language that expresses some action to be carried out.
+
 <!--v-->
 
 ## Exercises
